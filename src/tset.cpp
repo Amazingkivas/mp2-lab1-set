@@ -104,7 +104,7 @@ TSet TSet::operator*(const TSet& s) // пересечение
 
 TSet TSet::operator~(void) // дополнение
 {
-    TSet negation(*this);
+    TSet negation(MaxPower);
     negation.BitField = ~BitField;
 
     return negation;
