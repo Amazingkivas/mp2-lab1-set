@@ -62,11 +62,17 @@ TSet& TSet::operator=(const TSet& s) // присваивание
 
 int TSet::operator==(const TSet& s) const // сравнение
 {
+    if (MaxPower != s.MaxPower)
+        return 0;
+
     return BitField == s.BitField;
 }
 
 int TSet::operator!=(const TSet& s) const // сравнение
 {
+    if (MaxPower != s.MaxPower)
+        return 1;
+
     return BitField != s.BitField;
 }
 
@@ -116,30 +122,14 @@ istream& operator>>(istream& istr, TSet& s) // ввод
 {
     int max_number = s.GetMaxPower();
     int valInp;
-    cout << "Enter -1 to stop\n" << endl;
     while (true)
     {
-        cout << "Enter the number: ";
         istr >> valInp;
 
-        if (valInp == -1)
-            break;
-
-        if (valInp < 0 || valInp >= max_number)
-        {
-            cout << "Bad number, try again" << endl;
-            continue;
-        }
-        else if (s.IsMember(valInp))
-        {
-            cout << "This number is already included" << endl;
-            continue;
-        }
-        else
-        {
+        if (valInp >= 0 && valInp < max_number)
             s.InsElem(valInp);
-            cout << "\n";
-        }
+        else
+            break;
     }
     return istr;
 }

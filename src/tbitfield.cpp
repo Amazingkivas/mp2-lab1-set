@@ -16,7 +16,11 @@ TBitField::TBitField(int len)
 	else
 	{
 		BitLen = len;
-		MemLen = BitLen / (sizeof(TELEM) * 8) + 1;
+		MemLen = BitLen / (sizeof(TELEM) * 8);
+		if (MemLen * sizeof(TELEM) * 8 < len)
+		{
+			MemLen++;
+		}
 		pMem = new TELEM[MemLen];
 		memset(pMem, 0, MemLen * sizeof(TELEM));
 	}
@@ -42,7 +46,7 @@ int TBitField::GetMemIndex(const int n) const // индекс Мем для би
 
 TELEM TBitField::GetMemMask(const int n) const // битовая маска для бита n
 {
-	return 1 << (n & (sizeof(TELEM) * 8) - 1);
+	return 1 << (n % (sizeof(TELEM) * 8));
 }
 
 // доступ к битам битового поля
@@ -71,7 +75,12 @@ void TBitField::ClrBit(const int n) // очистить бит
 int TBitField::GetBit(const int n) const // получить значение бита
 {
 	if (n >= 0 && n < BitLen)
-		return pMem[GetMemIndex(n)] & GetMemMask(n);
+	{
+		if ((pMem[GetMemIndex(n)] & GetMemMask(n)) == 0)
+			return 0;
+
+		return 1;
+	}
 	else
 		throw exception("wrong index");
 }
@@ -117,9 +126,14 @@ int TBitField::operator!=(const TBitField& bf) const // сравнение
 TBitField TBitField::operator|(const TBitField& bf) // операция "или"
 {
 	TBitField tmp(max(BitLen, bf.BitLen));
-	for (int indMem = 0; indMem < min(MemLen, bf.MemLen); indMem++)
+
+	for (int i = 0; i < MemLen; i++)
 	{
-		tmp.pMem[indMem] = pMem[indMem] | bf.pMem[indMem];
+		tmp.pMem[i] = pMem[i];
+	}
+	for (int i = 0; i < bf.MemLen; i++)
+	{
+		tmp.pMem[i] |= bf.pMem[i];
 	}
 	return tmp;
 }
@@ -152,30 +166,14 @@ istream& operator>>(istream& istr, TBitField& bf) // ввод
 {
 	int max_number = bf.GetLength();
 	int valInp;
-	cout << "Enter -1 to stop\n" << endl;
 	while (true)
 	{
-		cout << "Enter the number: ";
 		istr >> valInp;
 
-		if (valInp == -1)
-			break;
-
-		if (valInp < 0 || valInp >= max_number)
-		{
-			cout << "Bad number, try again" << endl;
-			continue;
-		}
-		else if (bf.GetBit(valInp))
-		{
-			cout << "This number is already included" << endl;
-			continue;
-		}
-		else
-		{
+		if (valInp >= 0 && valInp < max_number)
 			bf.SetBit(valInp);
-			cout << "\n";
-		}
+		else
+			break;
 	}
 	return istr;
 }
