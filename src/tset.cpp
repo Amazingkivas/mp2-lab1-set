@@ -120,26 +120,12 @@ TSet TSet::operator~(void) // дополнение
 
 istream& operator>>(istream& istr, TSet& s) // ввод
 {
-    int max_number = s.GetMaxPower();
-    int valInp;
-    while (true)
-    {
-        istr >> valInp;
-
-        if (valInp >= 0 && valInp < max_number)
-            s.InsElem(valInp);
-        else
-            break;
-    }
+    istr >> s.BitField;
     return istr;
 }
 
 ostream& operator<<(ostream& ostr, const TSet& s) // вывод
 {
-    for (int indOut = 0; indOut < s.GetMaxPower(); indOut++)
-    {
-        if (s.IsMember(indOut))
-            ostr << indOut << " ";
-    }
+    ostr << s.BitField;
     return ostr;
 }

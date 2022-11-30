@@ -164,16 +164,23 @@ TBitField TBitField::operator~(void) // отрицание
 
 istream& operator>>(istream& istr, TBitField& bf) // ввод
 {
-	int max_number = bf.GetLength();
-	int valInp;
-	while (true)
+	int inp;
+	for(int indInp = 0; indInp < bf.GetLength(); indInp++)
 	{
-		istr >> valInp;
+		istr >> inp;
 
-		if (valInp >= 0 && valInp < max_number)
-			bf.SetBit(valInp);
+		if (inp == 1)
+		{
+			bf.SetBit(indInp);
+		}
+		else if (inp == 0)
+		{
+			bf.ClrBit(indInp);
+		}
 		else
-			break;
+		{
+			throw exception("Invalid input value");
+		}
 	}
 	return istr;
 }
@@ -182,8 +189,7 @@ ostream& operator<<(ostream& ostr, const TBitField& bf) // вывод
 {
 	for (int indOut = 0; indOut < bf.GetLength(); indOut++)
 	{
-		if (bf.GetBit(indOut))
-			ostr << indOut << " ";
+		ostr << bf.GetBit(indOut);
 	}
 	return ostr;
 }
